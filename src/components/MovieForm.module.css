@@ -1,0 +1,13 @@
+.form {
+    margin: 1rem;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 12px;
+    text-align: start;
+    color: black; 
+  }
+
+.form input {
+  width: 80%;
+  margin-bottom: 0.5rem;
+}
