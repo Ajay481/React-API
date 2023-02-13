@@ -13,35 +13,41 @@ function App() {
 
   const fetchMoviesHandler = useCallback(async () => {
     setIsLoading(true);
-    const response = await fetch("https://swapi.dev/api/films/");
+    const response = await fetch(
+      "https://react-http-2dd6e-default-rtdb.firebaseio.com/movies.json"
+    );
+    console.log(response)
     if (response.status === 404) {
       setIsLoading(false);
       setError(true);
     } else if (response.status === 200) {
       const data = await response.json();
+      console.log(data)
 
-      const transformedMovies = data.results.map((movieData) => {
-        return {
-          id: movieData.episode_id,
-          title: movieData.title,
-          openingText: movieData.opening_crawl,
-          releaseDate: movieData.release_date,
-        };
-      });
-      setMovies(transformedMovies);
+      const loadedMovies = [];
+
+      for (const key in data) {
+        loadedMovies.push({
+          id: key,
+          title: data[key].title,
+          openingText: data[key].openingText,
+          releaseDate: data[key].releaseDate,
+        });
+      }
+      setMovies(loadedMovies);
       setIsLoading(false);
       clearInterval(ref.current);
       setError(false);
     }
-  },[])
+  }, []);
   const cancelHandler = () => {
     setError(false);
     clearInterval(ref.current);
   };
 
   useEffect(() => {
-    fetchMoviesHandler()
-  },[fetchMoviesHandler])
+    fetchMoviesHandler();
+  }, [fetchMoviesHandler]);
 
   useEffect(() => {
     if (error) {
@@ -49,12 +55,28 @@ function App() {
         fetchMoviesHandler();
       }, 5000);
     }
-  }, [fetchMoviesHandler,error]);
+  }, [fetchMoviesHandler, error]);
+
+  const addMovieHandler = async (movie) => {
+    const response = await fetch(
+      "https://react-http-2dd6e-default-rtdb.firebaseio.com/movies.json",
+      {
+        method: "POST",
+        body: JSON.stringify(movie),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+    fetchMoviesHandler()
+  }; 
 
   let content = <p>Found no movie.</p>;
 
   if (movies.length > 0) {
-    content = <MoviesList movies={movies} />;
+    content = <MoviesList movies={movies} fetchMoviesHandler={fetchMoviesHandler}/>;
   }
 
   if (error) {
@@ -73,7 +95,7 @@ function App() {
   return (
     <React.Fragment>
       <section>
-      <MovieForm />
+        <MovieForm onAddMovie={addMovieHandler}/>
       </section>
       <section>
         <button onClick={fetchMoviesHandler}>Fetch Movies</button>

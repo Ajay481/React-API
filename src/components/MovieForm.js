@@ -1,57 +1,39 @@
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import classes from "./MovieForm.module.css";
 
-export const MovieForm = () => {
-  const [title, setTitle] = useState("");
-  const [openingText, setOpeningText] = useState("");
-  const [releaseDate, setReleaseDate] = useState("");
+export const MovieForm = (props) => {
+  const titleRef = useRef("");
+  const openingTextRef = useRef("");
+  const releaseDateRef = useRef("");
 
-  const titleHandler = (e) => {
-    setTitle(e.target.value);
-  };
-  const openingTextHandler = (e) => {
-    setOpeningText(e.target.value);
-  };
-  const releaseDateHandler = (e) => {
-    setReleaseDate(e.target.value);
-  };
-  const submitHandler = () => {
-    console.log(
-      `Title: ${title} Opening Text: ${openingText} Release Date: ${releaseDate}`
-    );
+  const submitHandler = (e) => {
+    e.preventDefault();
+
+    const movie = {
+      title: titleRef.current.value,
+      openingText: openingTextRef.current.value,
+      releaseDate: releaseDateRef.current.value,
+    };
+    props.onAddMovie(movie);
+    titleRef.current.value = "";
+    openingTextRef.current.value = "";
+    releaseDateRef.current.value = "";
   };
   return (
-    <div className={classes.form}>
+    <form className={classes.form}>
       <div>
-        <label>Title</label>
+        <label>Title:</label>
       </div>
-      <input
-        name="title"
-        placeholder=""
-        onChange={titleHandler}
-        value={title}
-      />
+      <input type="text" id="title" ref={titleRef} />
       <div>
-        <label>Opening Text</label>
+        <label>Opening Text:</label>
       </div>
-      <input
-        name="opening text"
-        placeholder=""
-        onChange={openingTextHandler}
-        value={openingText}
-      />
+      <textarea rows="5" id="opening text" ref={openingTextRef} />
       <div>
-        <label>Release Date</label>
+        <label>Release Date:</label>
       </div>
-      <input
-        name="release date"
-        placeholder=""
-        onChange={releaseDateHandler}
-        value={releaseDate}
-      />
-      <div>
-        <button onClick={submitHandler}>Add Movie</button>
-      </div>
-    </div>
+      <input type="text" id="release date" ref={releaseDateRef} />
+      <button onClick={submitHandler}>Add Movie</button>
+    </form>
   );
 };
